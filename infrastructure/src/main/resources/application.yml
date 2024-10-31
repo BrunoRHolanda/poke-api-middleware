@@ -20,3 +20,10 @@ spring:
       host: ${redis.host}
       port: ${redis.port}
       password: ${redis.password}
+  cache:
+    type: redis
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
