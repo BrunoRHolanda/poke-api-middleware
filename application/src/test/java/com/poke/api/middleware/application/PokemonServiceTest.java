@@ -17,38 +17,15 @@ import static org.mockito.Mockito.*;
  */
 class PokemonServiceTest {
 
-    private PokemonDatasource datasource;
     private PokemonGateway gateway;
     private PokemonService service;
     private Faker faker;
 
     @BeforeEach
     void setUp() {
-        datasource = mock(PokemonDatasource.class);
         gateway = mock(PokemonGateway.class);
-        service = new PokemonService(datasource, gateway);
+        service = new PokemonService(gateway);
         faker = new Faker();
-    }
-
-    /**
-     * Test scenario where the Pokémon is found in the local data source.
-     */
-    @Test
-    void testSearchPokemonFoundInDatasource() {
-        String pokemonName = faker.pokemon().name();
-        Ability ability = Ability.from(1, "Overgrow", "Boosts grass-type moves");
-        Pokemon pokemon = Pokemon.from(1, pokemonName, faker.internet().avatar(), List.of(ability));
-
-        when(datasource.findByName(pokemonName)).thenReturn(Optional.of(pokemon));
-
-        PokemonInput input = new PokemonInput(pokemonName);
-        PokemonOutput output = service.search(input);
-
-        verify(datasource, times(1)).findByName(pokemonName);
-        verifyNoInteractions(gateway);
-        assertEquals(pokemonName, output.name());
-        assertEquals(pokemon.getSprite(), output.sprite());
-        assertEquals(1, output.abilities().size());
     }
 
     /**
@@ -61,15 +38,12 @@ class PokemonServiceTest {
         Ability ability = Ability.from(1, "Blaze", "Boosts fire-type moves");
         Pokemon pokemon = Pokemon.from(1, pokemonName, faker.internet().avatar(), List.of(ability));
 
-        when(datasource.findByName(pokemonName)).thenReturn(Optional.empty());
         when(gateway.findByName(pokemonName)).thenReturn(Optional.of(pokemon));
 
         PokemonInput input = new PokemonInput(pokemonName);
         PokemonOutput output = service.search(input);
 
-        verify(datasource, times(1)).findByName(pokemonName);
         verify(gateway, times(1)).findByName(pokemonName);
-        verify(datasource, times(1)).save(pokemon);
         assertEquals(pokemonName, output.name());
         assertEquals(pokemon.getSprite(), output.sprite());
         assertEquals(1, output.abilities().size());
@@ -83,16 +57,13 @@ class PokemonServiceTest {
     void testSearchPokemonNotFoundAnywhere() {
         String pokemonName = faker.pokemon().name();
 
-        when(datasource.findByName(pokemonName)).thenReturn(Optional.empty());
         when(gateway.findByName(pokemonName)).thenReturn(Optional.empty());
 
         PokemonInput input = new PokemonInput(pokemonName);
         Exception exception = assertThrows(ApplicationException.class, () -> service.search(input));
 
         assertEquals("Pokemon not found", exception.getMessage());
-        verify(datasource, times(1)).findByName(pokemonName);
         verify(gateway, times(1)).findByName(pokemonName);
-        verify(datasource, never()).save(any());
     }
 
     /**
@@ -106,15 +77,12 @@ class PokemonServiceTest {
         Ability ability2 = Ability.from(2, "Solar Power", "Increases Sp. Atk");
         Pokemon pokemon = Pokemon.from(1, pokemonName, faker.internet().avatar(), List.of(ability2, ability1));
 
-        when(datasource.findByName(pokemonName)).thenReturn(Optional.empty());
         when(gateway.findByName(pokemonName)).thenReturn(Optional.of(pokemon));
 
         PokemonInput input = new PokemonInput(pokemonName);
         PokemonOutput output = service.search(input);
 
-        verify(datasource, times(1)).findByName(pokemonName);
         verify(gateway, times(1)).findByName(pokemonName);
-        verify(datasource, times(1)).save(pokemon);
 
         // Verify that abilities are sorted in alphabetical order
         assertEquals("Blaze", output.abilities().get(0).name());
