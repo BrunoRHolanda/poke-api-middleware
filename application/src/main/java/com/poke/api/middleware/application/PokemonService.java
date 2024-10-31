@@ -8,20 +8,16 @@ import com.poke.api.middleware.domain.Pokemon;
  */
 public class PokemonService {
 
-    private final PokemonDatasource datasource;
     private final PokemonGateway gateway;
 
     /**
      * Constructs a {@code PokemonService} with the specified data source and gateway.
      *
-     * @param datasource the {@link PokemonDatasource} for accessing local Pokémon data
-     * @param gateway    the {@link PokemonGateway} for accessing external Pokémon data
+     * @param gateway the {@link PokemonGateway} for accessing external Pokémon data
      */
     public PokemonService(
-            PokemonDatasource datasource,
             PokemonGateway gateway
     ) {
-        this.datasource = datasource;
         this.gateway = gateway;
     }
 
@@ -35,16 +31,10 @@ public class PokemonService {
      * @throws ApplicationException if the Pokémon is not found in both the data source and the gateway
      */
     public PokemonOutput search(PokemonInput input) {
-        Pokemon pokemon = datasource.findByName(input.name())
-                                    .orElseGet(() -> {
-                                        Pokemon pokemonFromGateway = gateway.findByName(input.name())
-                                                                            .orElseThrow(() -> new ApplicationException("Pokemon not found"));
-                                        pokemonFromGateway.sortAbilities();
+        Pokemon pokemon = gateway.findByName(input.name())
+                                 .orElseThrow(() -> new ApplicationException("Pokemon not found"));
 
-                                        datasource.save(pokemonFromGateway);
-
-                                        return pokemonFromGateway;
-                                    });
+        pokemon.sortAbilities();
 
         return PokemonOutput.from(pokemon);
     }
