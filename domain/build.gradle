@@ -1,0 +1,6 @@
+plugins {
+    id 'java-conventions'
+}
+
+group = 'com.poke.api.middleware.domain'
+version = '1.0-SNAPSHOT'

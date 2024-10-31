@@ -1,0 +1,5 @@
+rootProject.name = 'poke-api-middleware'
+include 'domain'
+include 'application'
+include 'infrastructure'
+
