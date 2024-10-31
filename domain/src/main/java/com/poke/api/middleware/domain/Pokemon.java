@@ -143,7 +143,6 @@ public class Pokemon extends Entity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Pokemon pokemon)) return false;
-        if (!super.equals(o)) return false;
         return Objects.equals(
                 name,
                 pokemon.name
@@ -166,7 +165,7 @@ public class Pokemon extends Entity {
     @Override
     public int hashCode() {
         return Objects.hash(
-                super.hashCode(),
+                getId(),
                 name,
                 sprite,
                 abilities

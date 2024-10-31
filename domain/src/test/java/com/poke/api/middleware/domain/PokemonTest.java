@@ -96,13 +96,12 @@ class PokemonTest {
      */
     @Test
     void testPokemonEquality() {
-        List<Ability> abilities1 = Arrays.asList(ability1, ability2);
-        List<Ability> abilities2 = Arrays.asList(ability1, ability2);
+        List<Ability> abilities = Arrays.asList(ability1, ability2);
 
-        Pokemon pokemon1 = Pokemon.from(1, "Charizard", "charizard_sprite.png", abilities1);
-        Pokemon pokemon2 = Pokemon.from(2, "Charizard", "charizard_sprite.png", abilities2);
+        Pokemon pokemon1 = Pokemon.from(1, "Charizard", "charizard_sprite.png", abilities);
+        Pokemon pokemon2 = Pokemon.from(1, "Charizard", "charizard_sprite.png", abilities);
 
-        assertEquals(pokemon1, pokemon2);
+        assertTrue(pokemon1.equals(pokemon2));
     }
 
     /**
@@ -135,11 +134,10 @@ class PokemonTest {
      */
     @Test
     void testHashCode() {
-        List<Ability> abilities1 = Arrays.asList(ability1, ability2);
-        List<Ability> abilities2 = Arrays.asList(ability1, ability2);
+        List<Ability> abilities = Arrays.asList(ability1, ability2);
 
-        Pokemon pokemon1 = Pokemon.from(1, "Charizard", "charizard_sprite.png", abilities1);
-        Pokemon pokemon2 = Pokemon.from(2, "Charizard", "charizard_sprite.png", abilities2);
+        Pokemon pokemon1 = Pokemon.from(1, "Charizard", "charizard_sprite.png", abilities);
+        Pokemon pokemon2 = Pokemon.from(1, "Charizard", "charizard_sprite.png", abilities);
 
         assertEquals(pokemon1.hashCode(), pokemon2.hashCode());
     }

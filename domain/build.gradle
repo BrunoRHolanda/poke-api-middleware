@@ -1,6 +1,26 @@
 plugins {
     id 'java-conventions'
+    id 'java-library'
 }
 
 group = 'com.poke.api.middleware.domain'
 version = '1.0-SNAPSHOT'
+
+dependencies {
+    testImplementation 'com.github.javafaker:javafaker:1.0.2'
+}
+
+configurations {
+    testClasses {
+        extendsFrom(testImplementation)
+    }
+}
+
+task testJar(type: Jar) {
+    archiveClassifier.set('test')
+    from sourceSets.test.output
+}
+
+artifacts {
+    testClasses testJar
+}
