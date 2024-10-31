@@ -17,16 +17,32 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * REST controller for handling requests related to Pokémon searches.
+ * This controller provides an endpoint for searching detailed information about a Pokémon by name.
+ */
 @RestController
-@RequestMapping("/api/v1/pokemon")
+@RequestMapping("/v1/pokemon")
 @Tag(name = "Pokemon API", description = "API for searching Pokémon details")
 public class PokemonController {
     private final PokemonService pokemonService;
 
+    /**
+     * Constructs a new {@link PokemonController} with the specified {@link PokemonService}.
+     *
+     * @param pokemonService the service used to handle Pokémon search operations
+     */
     public PokemonController(PokemonService pokemonService) {
         this.pokemonService = pokemonService;
     }
 
+    /**
+     * Endpoint to search for a Pokémon by its name.
+     * This method returns detailed information including the name, sprite, and abilities of the Pokémon.
+     *
+     * @param name the name of the Pokémon to search for
+     * @return a {@link PokemonOutput} object containing the Pokémon's details
+     */
     @GetMapping
     @Operation(
             summary = "Search for a Pokémon by name",
