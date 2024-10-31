@@ -1,5 +1,17 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url 'https://repo.spring.io/snapshot' }
+        maven { url 'https://repo.spring.io/milestone' }
+    }
+}
+
 plugins {
-    id 'java'
+    id 'java-conventions'
+    id 'application'
+    id 'jacoco-report-aggregation'
+    id 'org.springframework.boot' version '3.2.12-SNAPSHOT' // SNAPSHOT version requires snapshot repository
+    id 'io.spring.dependency-management' version '1.1.6'
 }
 
 group = 'com.poke.api.middleware.infrastructure'
@@ -9,11 +21,63 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
-test {
-    useJUnitPlatform()
+testCodeCoverageReport {
+    reports {
+        xml {
+            enabled true
+            destination file("$rootDir/build/reports/jacoco/test/jacocoTestReport.xml")
+        }
+
+        html {
+            enabled true
+            destination file("$rootDir/build/reports/jacoco/test/")
+        }
+    }
+}
+
+tasks.named("jacocoTestReport") {
+    dependsOn tasks.named("testCodeCoverageReport", JacocoReport)
+}
+
+bootJar {
+    archiveFileName = 'application.jar'
+    destinationDirectory.set(file("${rootProject.buildDir}/libs"))
+}
+
+dependencies {
+    implementation(project(":domain"))
+    implementation(project(":application"))
+
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation('org.springframework.boot:spring-boot-starter-web') {
+        exclude module: 'spring-boot-starter-tomcat'
+    }
+    implementation('com.fasterxml.jackson.module:jackson-module-afterburner')
+
+    implementation('org.yaml:snakeyaml:1.33') {
+        version { strictly("1.33") }
+    }
+
+    compileOnly 'org.projectlombok:lombok'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    testImplementation(project(path: ':domain', configuration: 'testClasses'))
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    testRuntimeOnly('com.h2database:h2')
 }

@@ -1,5 +1,6 @@
 package com.poke.api.middleware.domain;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -23,7 +24,7 @@ public class Pokemon extends Entity {
     /**
      * The list of abilities that the Pokémon possesses.
      */
-    private final List<Ability> abilities;
+    private List<Ability> abilities;
 
     /**
      * Constructs a Pokémon with the specified id, name, sprite, and abilities.
@@ -37,7 +38,7 @@ public class Pokemon extends Entity {
             final int id,
             final String name,
             final String sprite,
-            final List<Ability> abilities
+            List<Ability> abilities
     ) {
         super(id);
         this.name = name;
@@ -91,7 +92,7 @@ public class Pokemon extends Entity {
      *
      * @return an immutable list of abilities of the Pokémon
      */
-    public final List<Ability> getAbilities() {
+    public List<Ability> getAbilities() {
         return abilities;
     }
 
@@ -129,7 +130,11 @@ public class Pokemon extends Entity {
      * Sorts the abilities of the Pokémon alphabetically by their names.
      */
     public void sortAbilities() {
-        Collections.sort(abilities);
+        List<Ability> sortedAbilities = new ArrayList<>(this.abilities);
+
+        Collections.sort(sortedAbilities);
+
+        this.abilities = Collections.unmodifiableList(sortedAbilities);
     }
 
     /**

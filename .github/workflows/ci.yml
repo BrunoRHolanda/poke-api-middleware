@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+
+  ci:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout repository
+      - uses: actions/checkout@v4
+
+      # Step 2: Build the Docker image
+      - name: Build the Docker image
+        run: docker build . --file ci.dockerfile --tag BrunorHolanda/poke-api-middleware:latest
+
+      # Step 3: Start the Docker container in detached mode
+      - name: Start the Docker container
+        run: docker run -d --name poke-api-middleware BrunorHolanda/poke-api-middleware:latest
+
+      # Step 5: Run unit tests with JaCoCo coverage
+      - name: Run unit tests and generate coverage report
+        run: docker exec poke-api-middleware ./gradlew clean test jacocoTestReport
+
+      # Step 6: Copy coverage report from the container
+      - name: Copy JaCoCo coverage report
+        run: docker cp poke-api-middleware:/app/build/reports/jacoco/test/jacocoTestReport.xml .
+
+      # Step 8: Test the build
+      - name: Test the build
+        run: docker exec poke-api-middleware ./gradlew clean build
+
+      # Step 9: Stop and remove Docker container
+      - name: Stop and remove Docker container
+        run: |
+          docker stop poke-api-middleware
+          docker rm poke-api-middleware
+
+      # Step 10: Upload JaCoCo coverage report (optional)
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: jacoco-report
+          path: jacocoTestReport.xml
